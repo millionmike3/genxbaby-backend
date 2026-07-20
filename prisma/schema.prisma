@@ -1,0 +1,218 @@
+// ---------------------------------------------------------
+// DATASOURCE
+// ---------------------------------------------------------
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------
+// GENERATOR
+// ---------------------------------------------------------
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------
+enum Pillar {
+  STOCK_SANITIZER
+  CUSTOMER
+  INVESTOR
+}
+
+// ---------------------------------------------------------
+// MODELS — CHECK REGISTRY
+// ---------------------------------------------------------
+model BankProfile {
+  id              String  @id @default(cuid())
+  bankName        String
+  routingNumber   String
+  accountNumber   String
+  accountType     String
+  signerName      String?
+  signatureImage  String?
+  nextCheckNumber Int     @default(1)
+
+  checks Check[]
+}
+
+model Signer {
+  id             String  @id @default(cuid())
+  name           String
+  title          String?
+  signatureImage String?
+
+  checks Check[]
+}
+
+model Check {
+  id          String   @id @default(cuid())
+  checkNumber Int
+  payee       String
+  amount      Float
+  memo        String?
+  date        DateTime
+
+  bankProfileId String
+  signerId      String
+  createdAt     DateTime @default(now())
+
+  reissuedToId String?
+
+  bankProfile BankProfile @relation(fields: [bankProfileId], references: [id])
+  signer      Signer      @relation(fields: [signerId], references: [id])
+
+  fraudFlags FraudFlag[]
+  sarReports SuspiciousActivityReport[] // REQUIRED opposite relation
+}
+
+model FraudFlag {
+  id        String   @id @default(cuid())
+  type      String
+  severity  String
+  message   String
+  checkId   String
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  check      Check                      @relation(fields: [checkId], references: [id])
+  sarReports SuspiciousActivityReport[] // REQUIRED opposite relation
+}
+
+// ---------------------------------------------------------
+// MODELS — SUSPICIOUS ACTIVITY REPORTS
+// ---------------------------------------------------------
+model SuspiciousActivityReport {
+  id        String   @id @default(cuid())
+  flagId    String
+  checkId   String
+  severity  String
+  type      String
+  summary   String
+  createdAt DateTime @default(now())
+
+  flag  FraudFlag @relation(fields: [flagId], references: [id])
+  check Check     @relation(fields: [checkId], references: [id])
+}
+
+// ---------------------------------------------------------
+// MODELS — AUDIT SYSTEM
+// ---------------------------------------------------------
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  adminId   String
+  action    String
+  metadata  Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  admin Admin @relation(fields: [adminId], references: [id])
+}
+
+model AuditAnchor {
+  id        Int      @id @default(autoincrement())
+  root      String
+  count     Int
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------
+// MODELS — USERS, LEADS, INVESTORS
+// ---------------------------------------------------------
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+
+  behaviorSessions BehaviorSession[]
+  behaviorProfiles BehaviorProfile[]
+}
+
+model Lead {
+  id    String @id @default(cuid())
+  email String @unique
+
+  behaviorSessions BehaviorSession[]
+  behaviorProfiles BehaviorProfile[]
+}
+
+model Investor {
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+
+  behaviorSessions BehaviorSession[]
+  behaviorProfiles BehaviorProfile[]
+}
+
+// ---------------------------------------------------------
+// MODELS — BEHAVIOR + IMPULSIVENESS ENGINE
+// ---------------------------------------------------------
+model BehaviorSession {
+  id String @id @default(cuid())
+
+  userId     String?
+  leadId     String?
+  investorId String?
+
+  user     User?     @relation(fields: [userId], references: [id])
+  lead     Lead?     @relation(fields: [leadId], references: [id])
+  investor Investor? @relation(fields: [investorId], references: [id])
+
+  pillar Pillar
+
+  page      String
+  startedAt DateTime @default(now())
+  endedAt   DateTime
+
+  clickCount          Int
+  clickRate           Float
+  burstIndex          Int
+  rageClickScore      Float
+  formFillTimeMs      Int
+  abandonedFormsCount Int
+  avgTimeOnPageMs     Int
+  sessionVolatility   Float
+
+  impulsivenessScore Float
+
+  createdAt DateTime @default(now())
+}
+
+model BehaviorProfile {
+  id String @id @default(cuid())
+
+  userId     String?
+  leadId     String?
+  investorId String?
+
+  user     User?     @relation(fields: [userId], references: [id])
+  lead     Lead?     @relation(fields: [leadId], references: [id])
+  investor Investor? @relation(fields: [investorId], references: [id])
+
+  pillar Pillar
+
+  sessionsCount         Int   @default(0)
+  avgImpulsivenessScore Float @default(0)
+  maxImpulsivenessScore Float @default(0)
+
+  impulsivenessLevel String
+
+  updatedAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------
+// MODELS — ADMINS
+// ---------------------------------------------------------
+model Admin {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  role          String   @default("ADMIN")
+  walletAddress String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+  auditLogs AuditLog[]
+}
