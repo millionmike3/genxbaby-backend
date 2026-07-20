@@ -1,0 +1,186 @@
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import fs from "fs";
+import path from "path";
+
+export async function generateCheckPdf({
+  bank,
+  signer,
+  checkNumber,
+  payee,
+  amount,
+  memo,
+  date
+}) {
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([800, 350]);
+
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+
+  // -------------------------------------------------------
+  // 1. LOAD BACKGROUND SVG
+  // -------------------------------------------------------
+  const bgPath = path.join(process.cwd(), "public", "check-background.svg");
+  const bgSvg = fs.readFileSync(bgPath, "utf8");
+  const bgImage = await pdf.embedSvg(bgSvg);
+
+  page.drawImage(bgImage, {
+    x: 0,
+    y: 0,
+    width: 800,
+    height: 350
+  });
+
+  // -------------------------------------------------------
+  // 2. BANK INFO (Top Left)
+  // -------------------------------------------------------
+  page.drawText(bank.bankName, {
+    x: 40,
+    y: 300,
+    size: 18,
+    font: bold,
+    color: rgb(0, 0, 0)
+  });
+
+  page.drawText(`Routing: ${bank.routingNumber}`, {
+    x: 40,
+    y: 280,
+    size: 12,
+    font
+  });
+
+  page.drawText(`Account: ${bank.accountNumber}`, {
+    x: 40,
+    y: 260,
+    size: 12,
+    font
+  });
+
+  // -------------------------------------------------------
+  // 3. CHECK NUMBER (Top Right)
+  // -------------------------------------------------------
+  page.drawText(`#${checkNumber}`, {
+    x: 700,
+    y: 300,
+    size: 20,
+    font: bold
+  });
+
+  // -------------------------------------------------------
+  // 4. PAYEE LINE
+  // -------------------------------------------------------
+  page.drawText("Pay to the Order of:", {
+    x: 40,
+    y: 220,
+    size: 12,
+    font
+  });
+
+  page.drawText(payee, {
+    x: 200,
+    y: 220,
+    size: 14,
+    font: bold
+  });
+
+  // -------------------------------------------------------
+  // 5. DATE (Top Right)
+  // -------------------------------------------------------
+  page.drawText("Date:", {
+    x: 600,
+    y: 220,
+    size: 12,
+    font
+  });
+
+  page.drawText(date, {
+    x: 650,
+    y: 220,
+    size: 12,
+    font
+  });
+
+  // -------------------------------------------------------
+  // 6. AMOUNT (Numeric)
+  // -------------------------------------------------------
+  page.drawText(`$${amount.toFixed(2)}`, {
+    x: 700,
+    y: 180,
+    size: 16,
+    font: bold
+  });
+
+  // -------------------------------------------------------
+  // 7. AMOUNT (Written)
+  // -------------------------------------------------------
+  const written = convertAmountToWords(amount);
+  page.drawText(`${written} dollars`, {
+    x: 40,
+    y: 180,
+    size: 12,
+    font
+  });
+
+  // -------------------------------------------------------
+  // 8. MEMO LINE
+  // -------------------------------------------------------
+  page.drawText("Memo:", {
+    x: 40,
+    y: 140,
+    size: 12,
+    font
+  });
+
+  page.drawText(memo || "", {
+    x: 100,
+    y: 140,
+    size: 12,
+    font
+  });
+
+  // -------------------------------------------------------
+  // 9. SIGNATURE
+  // -------------------------------------------------------
+  if (signer.signatureImage) {
+    const sigImage = await pdf.embedPng(signer.signatureImage);
+    page.drawImage(sigImage, {
+      x: 600,
+      y: 120,
+      width: 150,
+      height: 50
+    });
+  }
+
+  // -------------------------------------------------------
+  // 10. MICR LINE (Bottom)
+  // -------------------------------------------------------
+  const micr = `⑆${bank.routingNumber}⑆ ${bank.accountNumber}⑈ ${checkNumber}`;
+  page.drawText(micr, {
+    x: 40,
+    y: 60,
+    size: 18,
+    font: bold,
+    color: rgb(0, 0, 0)
+  });
+
+  return await pdf.save();
+}
+
+// -------------------------------------------------------
+// Helper: Convert Amount to Words
+// -------------------------------------------------------
+function convertAmountToWords(amount) {
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  });
+
+  const [dollars, cents] = formatter
+    .format(amount)
+    .replace("$", "")
+    .split(".");
+
+  const toWords = require("number-to-words").toWords;
+
+  return `${toWords(parseInt(dollars))} and ${cents}/100`;
+}
