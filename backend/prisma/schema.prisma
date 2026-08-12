@@ -1,0 +1,606 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//
+// ─────────────────────────────────────────────────────────────
+//   OWNER + IDENTITY MODELS
+// ─────────────────────────────────────────────────────────────
+//
+
+model Owner {
+  id             String @id @default(cuid())
+  organizationId String // NEW
+
+  fullName       String
+  dob            DateTime?
+  email          String?
+  phone          String?
+  primaryAddress String?
+
+  verificationStatus IdentityVerificationStatus @default(UNVERIFIED)
+  riskScore          Int                        @default(0)
+  riskLevel          IdentityRiskLevel          @default(LOW)
+
+  bankProfiles BankProfile[]
+  signers      Signer[]
+  checks       Check[]
+  documents    OwnerDocument[]
+  devices      OwnerDevice[]
+  accounts     OwnerAccount[]
+
+  identityEvents IdentityEvent[]
+  fraudFlags     FraudFlag[]
+  sarReports     SuspiciousActivityReport[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  User         User[]
+  Role         Role[]
+  FraudAlert   FraudAlert[]
+  Case         Case[]
+}
+
+model OwnerDevice {
+  id        String   @id @default(cuid())
+  ownerId   String
+  deviceId  String
+  ipAddress String?
+  lastSeen  DateTime @default(now())
+
+  owner Owner @relation(fields: [ownerId], references: [id])
+}
+
+model OwnerAccount {
+  id            String   @id @default(cuid())
+  ownerId       String
+  routingNumber String
+  accountNumber String
+  createdAt     DateTime @default(now())
+
+  owner Owner @relation(fields: [ownerId], references: [id])
+}
+
+//
+// ─────────────────────────────────────────────────────────────
+//   USER + RBAC MODELS
+// ─────────────────────────────────────────────────────────────
+//
+
+model User {
+  id             String @id @default(cuid())
+  ownerId        String
+  organizationId String // NEW
+
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+
+  theme       String @default("dark")
+  accentColor String @default("#3CF46B")
+  density     String @default("comfortable")
+
+  owner           Owner             @relation(fields: [ownerId], references: [id])
+  organization    Organization      @relation(fields: [organizationId], references: [id])
+  roles           UserRole[]
+  BehaviorProfile BehaviorProfile[]
+  BehaviorSession BehaviorSession[]
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  ownerId   String
+  name      String
+  createdAt DateTime @default(now())
+
+  Owner          Owner            @relation(fields: [ownerId], references: [id])
+  RolePermission RolePermission[]
+  UserRole       UserRole[]
+}
+
+model Permission {
+  id             String           @id @default(cuid())
+  key            String           @unique
+  name           String
+  RolePermission RolePermission[]
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+
+  Role       Role       @relation(fields: [roleId], references: [id])
+  Permission Permission @relation(fields: [permissionId], references: [id])
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+}
+
+//
+// ─────────────────────────────────────────────────────────────
+//   BANKING + CHECK MODELS
+// ─────────────────────────────────────────────────────────────
+//
+
+model BankProfile {
+  id              String   @id @default(cuid())
+  ownerId         String
+  bankName        String
+  routingNumber   String
+  accountNumber   String
+  accountType     String
+  signerName      String?
+  signatureImage  String?
+  nextCheckNumber Int      @default(1)
+  createdAt       DateTime @default(now())
+
+  owner   Owner    @relation(fields: [ownerId], references: [id])
+  signers Signer[]
+  checks  Check[]
+}
+
+model Signer {
+  id             String   @id @default(cuid())
+  bankProfileId  String
+  name           String
+  title          String?
+  signatureImage String?
+  createdAt      DateTime @default(now())
+
+  bankProfile BankProfile @relation(fields: [bankProfileId], references: [id])
+  checks      Check[]
+  Owner       Owner?      @relation(fields: [ownerId], references: [id])
+  ownerId     String?
+}
+
+model Check {
+  id             String @id @default(cuid())
+  organizationId String // NEW
+
+  checkNumber Int
+  payee       String
+  amount      Float
+  memo        String?
+  date        DateTime
+
+  bankProfileId String
+  signerId      String
+  createdAt     DateTime @default(now())
+  reissuedToId  String?
+
+  status     CheckStatus @default(PENDING)
+  issuedAt   DateTime?
+  clearedAt  DateTime?
+  returnedAt DateTime?
+  voidedAt   DateTime?
+  archivedAt DateTime?
+
+  lifecycleEvents CheckLifecycleEvent[]
+  auditLogs       CheckAuditLog[]
+
+  bankProfile BankProfile                @relation(fields: [bankProfileId], references: [id])
+  signer      Signer                     @relation(fields: [signerId], references: [id])
+  fraudFlags  FraudFlag[]
+  sarReports  SuspiciousActivityReport[]
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  Owner        Owner?       @relation(fields: [ownerId], references: [id])
+  ownerId      String?
+}
+
+model CheckLifecycleEvent {
+  id        String        @id @default(cuid())
+  checkId   String
+  type      LifecycleType
+  timestamp DateTime      @default(now())
+  metadata  Json?
+
+  check Check @relation(fields: [checkId], references: [id])
+}
+
+model CheckAuditLog {
+  id        String   @id @default(cuid())
+  checkId   String
+  action    String
+  timestamp DateTime @default(now())
+  actorId   String?
+  metadata  Json?
+
+  check Check @relation(fields: [checkId], references: [id])
+}
+
+enum CheckStatus {
+  ISSUED
+  PENDING
+  CLEARED
+  RETURNED
+  VOIDED
+  REISSUED
+  ARCHIVED
+}
+
+enum LifecycleType {
+  CREATED
+  ISSUED
+  CLEARED
+  RETURNED
+  VOIDED
+  REISSUED
+  ARCHIVED
+}
+
+model FraudFlag {
+  id        String   @id @default(cuid())
+  type      String
+  severity  String
+  message   String
+  checkId   String
+  createdAt DateTime @default(now())
+  resolved  Boolean  @default(false)
+
+  check      Check                      @relation(fields: [checkId], references: [id])
+  sarReports SuspiciousActivityReport[]
+  Owner      Owner?                     @relation(fields: [ownerId], references: [id])
+  ownerId    String?
+}
+
+model SuspiciousActivityReport {
+  id        String   @id @default(cuid())
+  flagId    String
+  checkId   String
+  severity  String
+  type      String
+  summary   String
+  createdAt DateTime @default(now())
+
+  check   Check     @relation(fields: [checkId], references: [id])
+  flag    FraudFlag @relation(fields: [flagId], references: [id])
+  Owner   Owner?    @relation(fields: [ownerId], references: [id])
+  ownerId String?
+}
+
+//
+// ─────────────────────────────────────────────────────────────
+//   ADMIN + AUDIT MODELS
+// ─────────────────────────────────────────────────────────────
+//
+
+model Admin {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  role          String   @default("ADMIN")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  walletAddress String?
+
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  createdAt DateTime @default(now())
+  adminId   String
+  ip        String?
+  metadata  Json?
+
+  admin Admin @relation(fields: [adminId], references: [id])
+}
+
+model AuditAnchor {
+  id        Int      @id @default(autoincrement())
+  root      String
+  count     Int
+  createdAt DateTime @default(now())
+}
+
+//
+// ─────────────────────────────────────────────────────────────
+//   BEHAVIOR ANALYTICS MODELS
+// ─────────────────────────────────────────────────────────────
+//
+
+model BehaviorSession {
+  id                  String   @id @default(cuid())
+  userId              String?
+  leadId              String?
+  investorId          String?
+  pillar              Pillar
+  page                String
+  startedAt           DateTime @default(now())
+  endedAt             DateTime
+  clickCount          Int
+  clickRate           Float
+  burstIndex          Int
+  rageClickScore      Float
+  formFillTimeMs      Int
+  abandonedFormsCount Int
+  avgTimeOnPageMs     Int
+  sessionVolatility   Float
+  impulsivenessScore  Float
+  createdAt           DateTime @default(now())
+
+  investor Investor? @relation(fields: [investorId], references: [id])
+  lead     Lead?     @relation(fields: [leadId], references: [id])
+  user     User?     @relation(fields: [userId], references: [id])
+}
+
+model BehaviorProfile {
+  id                    String   @id @default(cuid())
+  userId                String?
+  leadId                String?
+  investorId            String?
+  pillar                Pillar
+  sessionsCount         Int      @default(0)
+  avgImpulsivenessScore Float    @default(0)
+  maxImpulsivenessScore Float    @default(0)
+  impulsivenessLevel    String
+  updatedAt             DateTime @default(now())
+
+  investor Investor? @relation(fields: [investorId], references: [id])
+  lead     Lead?     @relation(fields: [leadId], references: [id])
+  user     User?     @relation(fields: [userId], references: [id])
+}
+
+model Lead {
+  id    String @id @default(uuid())
+  email String @unique
+
+  behaviorProfiles BehaviorProfile[]
+  behaviorSessions BehaviorSession[]
+}
+
+model Investor {
+  id    String  @id @default(uuid())
+  email String  @unique
+  name  String?
+
+  behaviorProfiles BehaviorProfile[]
+  behaviorSessions BehaviorSession[]
+}
+
+enum Pillar {
+  STOCK_SANITIZER
+  CUSTOMER
+  INVESTOR
+}
+
+//
+// ─────────────────────────────────────────────────────────────
+//   RISK + PRICING MODELS
+// ─────────────────────────────────────────────────────────────
+//
+
+model RiskHistoryLog {
+  id        String   @id @default(cuid())
+  ownerId   String
+  timestamp DateTime @default(now())
+
+  fraudScore      Int
+  sarSeverity     Int
+  volatilityIndex Int
+  behaviorScore   Int
+  bankRiskScore   Int
+
+  riskScore    Int
+  riskTier     String
+  finalRateBps Int
+
+  @@index([ownerId])
+}
+
+model PricingDecisionLog {
+  id        String   @id @default(cuid())
+  ownerId   String
+  timestamp DateTime @default(now())
+
+  baseRateBps  Int
+  marginBps    Int
+  finalRateBps Int
+
+  riskScore Int
+  riskTier  String
+
+  fraudScore      Int
+  sarSeverity     Int
+  volatilityIndex Int
+  behaviorScore   Int
+  bankRiskScore   Int
+
+  @@index([ownerId])
+}
+
+//
+// ─────────────────────────────────────────────────────────────
+//   DOCUMENT + OCR + FRAUD MODELS
+// ─────────────────────────────────────────────────────────────
+//
+
+model OwnerDocument {
+  id             String @id @default(cuid())
+  ownerId        String
+  organizationId String // NEW
+
+  fileName  String
+  filePath  String
+  mimeType  String
+  status    String
+  createdAt DateTime @default(now())
+
+  ocrExtractions OCRExtraction[]
+  fraudResults   DocumentFraudResult[]
+
+  owner        Owner        @relation(fields: [ownerId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([ownerId])
+}
+
+model OCRExtraction {
+  id        String   @id @default(cuid())
+  docId     String
+  text      String
+  createdAt DateTime @default(now())
+
+  document OwnerDocument @relation(fields: [docId], references: [id])
+}
+
+model DocumentFraudResult {
+  id         String   @id @default(cuid())
+  docId      String
+  fraudScore Int
+  issues     String[]
+  createdAt  DateTime @default(now())
+
+  document OwnerDocument @relation(fields: [docId], references: [id])
+}
+
+//
+// ─────────────────────────────────────────────────────────────
+//   TIMELINE EVENTS
+// ─────────────────────────────────────────────────────────────
+//
+
+model TimelineEvent {
+  id            String   @id @default(uuid())
+  applicationId String
+  borrowerId    String
+  eventType     String
+  payload       Json
+  createdAt     DateTime @default(now())
+}
+
+model FraudAlert {
+  id             String @id @default(uuid())
+  ownerId        String
+  organizationId String // NEW
+
+  type      String
+  severity  String
+  meta      String
+  timestamp DateTime @default(now())
+
+  owner        Owner        @relation(fields: [ownerId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  Case         Case?        @relation(fields: [caseId], references: [id])
+  caseId       String?
+}
+
+model IdentityEvent {
+  id        String            @id @default(cuid())
+  ownerId   String
+  type      IdentityEventType
+  timestamp DateTime          @default(now())
+  metadata  Json?
+
+  owner Owner @relation(fields: [ownerId], references: [id])
+}
+
+enum IdentityVerificationStatus {
+  UNVERIFIED
+  PARTIALLY_VERIFIED
+  VERIFIED
+  HIGH_RISK
+  SYNTHETIC_SUSPECT
+}
+
+enum IdentityRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IdentityEventType {
+  CREATED
+  UPDATED
+  VERIFIED
+  FLAGGED
+  DEVICE_ADDED
+  ACCOUNT_ADDED
+  DOCUMENT_ADDED
+  FRAUD_ALERT
+}
+
+model Case {
+  id             String @id @default(uuid())
+  ownerId        String
+  organizationId String // NEW
+
+  owner Owner @relation(fields: [ownerId], references: [id])
+
+  status    CaseStatus @default(OPEN)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  notes       CaseNote[]
+  alerts      FraudAlert[]
+  attachments CaseAttachment[]
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+model CaseNote {
+  id        String   @id @default(uuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model CaseAttachment {
+  id        String   @id @default(uuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+  type      String
+  refId     String
+  createdAt DateTime @default(now())
+}
+
+enum CaseStatus {
+  OPEN
+  REVIEW
+  ESCALATED
+  CLOSED
+}
+
+model Event {
+  id             String   @id @default(uuid())
+  type           String
+  ownerId        String?
+  organizationId String? // NEW
+  payload        Json
+  createdAt      DateTime @default(now())
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  owners    Owner[]
+  users     User[]
+  checks    Check[]
+  cases     Case[]
+  alerts    FraudAlert[]
+  documents OwnerDocument[]
+  Event     Event[]
+}
