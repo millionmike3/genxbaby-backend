@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     password: str
-    role: str  # BORROWER, INVESTOR, OWNER, ADMIN
+    role: str
     domain_id: Optional[int] = None
 
 
@@ -90,21 +90,16 @@ class BrandProfileBase(BaseModel):
 
 
 class BrandProfileCreate(BrandProfileBase):
-    routing_number: str
-    account_number: str
+    pass
 
 
 class BrandProfileUpdate(BaseModel):
     domain: Optional[str] = None
     bank_name: Optional[str] = None
-    routing_number: Optional[str] = None
-    account_number: Optional[str] = None
 
 
 class BrandProfileOut(BrandProfileBase):
     id: int
-    routing_number: str
-    account_number: str
     created_at: datetime
 
     class Config:
@@ -129,21 +124,29 @@ class UserVaultOut(BaseModel):
 # ============================================================
 class PropertyBase(BaseModel):
     address: str
-    city: str
-    state: str
-    zip_code: str
     price: float
+    domain_id: int
 
 
 class PropertyCreate(PropertyBase):
-    owner_user_id: int
-    domain_id: int
+    pass
 
 
 class PropertyOut(PropertyBase):
     id: int
-    owner_user_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================
+# BULK TAPE SCHEMAS
+# ============================================================
+class BulkTapeOut(BaseModel):
+    id: int
     domain_id: int
+    file_url: str
     created_at: datetime
 
     class Config:
