@@ -1,1 +1,0 @@
-doc.registerFont("MICR", path.join(process.cwd(), "lib/pdf/fonts/MICR.ttf"));
