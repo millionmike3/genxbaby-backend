@@ -342,3 +342,20 @@ class DigitalAssetOut(BaseModel):
 
     class Config:
         from_attributes = True
+# ============================================================
+# BORROWER SCHEMAS
+# ============================================================
+class BorrowerCreate(BaseModel):
+    user_id: int
+    domain_id: int
+
+
+class BorrowerResponse(BaseModel):
+    id: int
+    user_id: int
+    domain_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
