@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from database import Base, engine, SessionLocal
-from models import Borrower, BrandProfile, UserVault, DigitalAsset
+from models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
 from schemas import (
     UserCreate,
     UserLogin,
