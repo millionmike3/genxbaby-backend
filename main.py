@@ -8,13 +8,36 @@ from models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
 from schemas import (
     UserCreate,
     UserLogin,
+    XPUpdate,
     UserOut,
+    DomainCreate,
+    DomainOut,
+    InvestorOut,
+    BorrowerOut,
+    BrandProfileBase,
     BrandProfileCreate,
+    BrandProfileUpdate,
     BrandProfileOut,
     UserVaultOut,
+    PropertyCreate,
+    PropertyOut,
+    BulkTapeOut,
+    BulkTapePropertyOut,
+    CreditReportSummaryOut,
+    MortgageApplicationCreate,
+    MortgageApplicationOut,
+    SignalOut,
+    ProofOfFundsOut,
+    LoanEstimateCreate,
+    LoanEstimateOut,
+    ClosingDisclosureOut,
+    DisbursementCheckOut,
     DigitalAssetCreate,
     DigitalAssetOut,
+    BorrowerCreate,
+    BorrowerResponse
 )
+
 from rbac import get_current_user
 
 # Routers
