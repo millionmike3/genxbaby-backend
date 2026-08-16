@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Any
+from typing import Optional
 from datetime import datetime
 
 
@@ -88,3 +88,16 @@ class BorrowerOut(BaseModel):
 class BrandProfileBase(BaseModel):
     domain: str
     bank_name: str
+
+
+class BrandProfileCreate(BrandProfileBase):
+    """Used when creating a brand profile"""
+    pass
+
+
+class BrandProfileOut(BrandProfileBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
