@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-
 # ============================================================
 # USER + AUTH SCHEMAS
 # ============================================================
@@ -91,24 +90,21 @@ class BrandProfileBase(BaseModel):
 
 
 class BrandProfileCreate(BrandProfileBase):
-    account_number: str
     routing_number: str
-    ein_number: Optional[str] = None
+    account_number: str
 
 
 class BrandProfileUpdate(BaseModel):
     domain: Optional[str] = None
     bank_name: Optional[str] = None
-    account_number: Optional[str] = None
     routing_number: Optional[str] = None
-    ein_number: Optional[str] = None
+    account_number: Optional[str] = None
 
 
 class BrandProfileOut(BrandProfileBase):
     id: int
-    account_number: str
     routing_number: str
-    ein_number: Optional[str]
+    account_number: str
     created_at: datetime
 
     class Config:
@@ -116,13 +112,38 @@ class BrandProfileOut(BrandProfileBase):
 
 
 # ============================================================
-# USER VAULT SCHEMAS (fixing your import error)
+# USER VAULT SCHEMAS
 # ============================================================
 class UserVaultOut(BaseModel):
     id: int
     user_id: int
-    vault_key: str
-    vault_value: str
+    balance: float
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================
+# PROPERTY SCHEMAS
+# ============================================================
+class PropertyBase(BaseModel):
+    address: str
+    city: str
+    state: str
+    zip_code: str
+    price: float
+
+
+class PropertyCreate(PropertyBase):
+    owner_user_id: int
+    domain_id: int
+
+
+class PropertyOut(PropertyBase):
+    id: int
+    owner_user_id: int
+    domain_id: int
     created_at: datetime
 
     class Config:
