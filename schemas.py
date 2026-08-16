@@ -91,12 +91,26 @@ class BrandProfileBase(BaseModel):
 
 
 class BrandProfileCreate(BrandProfileBase):
-    """Used when creating a brand profile"""
-    pass
+    account_number: str
+    routing_number: str
+    ein_number: Optional[str] = None
+    address: Optional[str] = None
+
+
+class BrandProfileUpdate(BaseModel):
+    bank_name: Optional[str] = None
+    account_number: Optional[str] = None
+    routing_number: Optional[str] = None
+    ein_number: Optional[str] = None
+    address: Optional[str] = None
 
 
 class BrandProfileOut(BrandProfileBase):
     id: int
+    account_number: str
+    routing_number: str
+    ein_number: Optional[str]
+    address: Optional[str]
     created_at: datetime
 
     class Config:
