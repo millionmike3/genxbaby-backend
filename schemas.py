@@ -94,15 +94,14 @@ class BrandProfileCreate(BrandProfileBase):
     account_number: str
     routing_number: str
     ein_number: Optional[str] = None
-    address: Optional[str] = None
 
 
 class BrandProfileUpdate(BaseModel):
+    domain: Optional[str] = None
     bank_name: Optional[str] = None
     account_number: Optional[str] = None
     routing_number: Optional[str] = None
     ein_number: Optional[str] = None
-    address: Optional[str] = None
 
 
 class BrandProfileOut(BrandProfileBase):
@@ -110,7 +109,20 @@ class BrandProfileOut(BrandProfileBase):
     account_number: str
     routing_number: str
     ein_number: Optional[str]
-    address: Optional[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================
+# USER VAULT SCHEMAS (fixing your import error)
+# ============================================================
+class UserVaultOut(BaseModel):
+    id: int
+    user_id: int
+    vault_key: str
+    vault_value: str
     created_at: datetime
 
     class Config:
