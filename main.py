@@ -14,7 +14,6 @@ from schemas import (
     DomainOut,
     InvestorOut,
     BorrowerOut,
-    BrandProfileBase,
     BrandProfileCreate,
     BrandProfileUpdate,
     BrandProfileOut,
