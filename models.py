@@ -1,97 +1,49 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
-from database import get_db
-from models import Borrower, User, Domain
-
-router = APIRouter(
-    prefix="/borrowers",
-    tags=["Borrowers"]
-)
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from database import Base
+from datetime import datetime
 
 # -----------------------------------------------------------
-# GET ALL BORROWERS
+# USER MODEL
 # -----------------------------------------------------------
-@router.get("/")
-def get_all_borrowers(db: Session = Depends(get_db)):
-    borrowers = db.query(Borrower).all()
-    return borrowers
+class User(Base):
+    __tablename__ = "users"
 
-# -----------------------------------------------------------
-# GET BORROWER BY ID
-# -----------------------------------------------------------
-@router.get("/{borrower_id}")
-def get_borrower(borrower_id: int, db: Session = Depends(get_db)):
-    borrower = db.query(Borrower).filter(Borrower.id == borrower_id).first()
-    if not borrower:
-        raise HTTPException(status_code=404, detail="Borrower not found")
-    return borrower
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    username = Column(String)
+    password_hash = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationship to Borrowers
+    borrowers = relationship("Borrower", back_populates="user")
+
 
 # -----------------------------------------------------------
-# CREATE BORROWER
+# DOMAIN MODEL
 # -----------------------------------------------------------
-@router.post("/")
-def create_borrower(user_id: int, domain_id: int, db: Session = Depends(get_db)):
-    # Validate user exists
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+class Domain(Base):
+    __tablename__ = "domains"
 
-    # Validate domain exists
-    domain = db.query(Domain).filter(Domain.id == domain_id).first()
-    if not domain:
-        raise HTTPException(status_code=404, detail="Domain not found")
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Create borrower record
-    borrower = Borrower(
-        user_id=user_id,
-        domain_id=domain_id
-    )
+    # Relationship to Borrowers
+    borrowers = relationship("Borrower", back_populates="domain")
 
-    db.add(borrower)
-    db.commit()
-    db.refresh(borrower)
-
-    return borrower
 
 # -----------------------------------------------------------
-# UPDATE BORROWER (change domain or user)
+# BORROWER MODEL
 # -----------------------------------------------------------
-@router.put("/{borrower_id}")
-def update_borrower(borrower_id: int, user_id: int = None, domain_id: int = None, db: Session = Depends(get_db)):
-    borrower = db.query(Borrower).filter(Borrower.id == borrower_id).first()
-    if not borrower:
-        raise HTTPException(status_code=404, detail="Borrower not found")
+class Borrower(Base):
+    __tablename__ = "borrowers"
 
-    # Update user if provided
-    if user_id is not None:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        borrower.user_id = user_id
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    domain_id = Column(Integer, ForeignKey("domains.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Update domain if provided
-    if domain_id is not None:
-        domain = db.query(Domain).filter(Domain.id == domain_id).first()
-        if not domain:
-            raise HTTPException(status_code=404, detail="Domain not found")
-        borrower.domain_id = domain_id
-
-    db.commit()
-    db.refresh(borrower)
-
-    return borrower
-
-# -----------------------------------------------------------
-# DELETE BORROWER
-# -----------------------------------------------------------
-@router.delete("/{borrower_id}")
-def delete_borrower(borrower_id: int, db: Session = Depends(get_db)):
-    borrower = db.query(Borrower).filter(Borrower.id == borrower_id).first()
-    if not borrower:
-        raise HTTPException(status_code=404, detail="Borrower not found")
-
-    db.delete(borrower)
-    db.commit()
-
-    return {"message": "Borrower deleted successfully"}
+    # Relationships
+    user = relationship("User", back_populates="borrowers")
+    domain = relationship("Domain", back_populates="borrowers")
