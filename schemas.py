@@ -233,4 +233,31 @@ class CreditReportSummaryOut(CreditReportSummaryBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# MORTGAGE APPLICATION SCHEMAS
+# ============================================================
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+class MortgageApplicationBase(BaseModel):
+    user_id: int
+    domain_id: int
+    property_id: int
+    loan_amount: float
+    status: str  # e.g. PENDING, APPROVED, REJECTED
+
+class MortgageApplicationCreate(MortgageApplicationBase):
+    pass
+
+class MortgageApplicationUpdate(BaseModel):
+    loan_amount: Optional[float] = None
+    status: Optional[str] = None
+
+class MortgageApplicationOut(MortgageApplicationBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
