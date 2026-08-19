@@ -310,3 +310,31 @@ class ClosingDisclosureOut(ClosingDisclosureBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# DISBURSEMENT CHECK SCHEMAS
+# ============================================================
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+class DisbursementCheckBase(BaseModel):
+    user_id: int
+    domain_id: int
+    amount: float
+    payee: str
+    memo: Optional[str] = None
+
+class DisbursementCheckCreate(DisbursementCheckBase):
+    pass
+
+class DisbursementCheckUpdate(BaseModel):
+    amount: Optional[float] = None
+    payee: Optional[str] = None
+    memo: Optional[str] = None
+
+class DisbursementCheckOut(DisbursementCheckBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
