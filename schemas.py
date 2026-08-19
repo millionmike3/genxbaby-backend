@@ -252,3 +252,32 @@ class ProofOfFundsOut(ProofOfFundsBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# LOAN ESTIMATE SCHEMAS
+# ============================================================
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+class LoanEstimateBase(BaseModel):
+    user_id: int
+    domain_id: int
+    property_id: int
+    loan_amount: float
+    interest_rate: float
+    term_months: int
+
+class LoanEstimateCreate(LoanEstimateBase):
+    pass
+
+class LoanEstimateUpdate(BaseModel):
+    loan_amount: Optional[float] = None
+    interest_rate: Optional[float] = None
+    term_months: Optional[int] = None
+
+class LoanEstimateOut(LoanEstimateBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
