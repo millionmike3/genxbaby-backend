@@ -135,6 +135,35 @@ class BulkTapeOut(BaseModel):
     domain_id: int
     file_url: str
     created_at: datetime
+    # ============================================================
+# BULK TAPE PROPERTY SCHEMAS
+# ============================================================
+from typing import Optional
+from datetime import datetime
+from pydantic import BaseModel
+
+class BulkTapePropertyBase(BaseModel):
+    bulk_tape_id: int     # link to BulkTapeOut
+    address: str
+    price: float
+    domain_id: int
+
+class BulkTapePropertyCreate(BulkTapePropertyBase):
+    pass
+
+class BulkTapePropertyUpdate(BaseModel):
+    bulk_tape_id: Optional[int] = None
+    address: Optional[str] = None
+    price: Optional[float] = None
+    domain_id: Optional[int] = None
+
+class BulkTapePropertyOut(BulkTapePropertyBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 
     class Config:
         from_attributes = True
