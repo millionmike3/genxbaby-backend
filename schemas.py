@@ -338,3 +338,33 @@ class DisbursementCheckOut(DisbursementCheckBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# DIGITAL ASSET SCHEMAS
+# ============================================================
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+class DigitalAssetBase(BaseModel):
+    user_id: int
+    domain_id: int
+    name: str
+    type: str        # e.g. TOKEN, NFT, DOCUMENT
+    value: float
+    metadata: Optional[str] = None
+
+class DigitalAssetCreate(DigitalAssetBase):
+    pass
+
+class DigitalAssetUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    value: Optional[float] = None
+    metadata: Optional[str] = None
+
+class DigitalAssetOut(DigitalAssetBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
