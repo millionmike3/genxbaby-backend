@@ -260,4 +260,30 @@ class MortgageApplicationOut(MortgageApplicationBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# SIGNAL SCHEMAS
+# ============================================================
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+class SignalBase(BaseModel):
+    user_id: int
+    domain_id: int
+    type: str        # e.g. ALERT, WARNING, INFO
+    message: str
+
+class SignalCreate(SignalBase):
+    pass
+
+class SignalUpdate(BaseModel):
+    type: Optional[str] = None
+    message: Optional[str] = None
+
+class SignalOut(SignalBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
