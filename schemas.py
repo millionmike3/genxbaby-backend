@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     password: str
-    role: str
+    role: str  # BORROWER, INVESTOR, OWNER, ADMIN
     domain_id: Optional[int] = None
 
 
@@ -107,19 +107,6 @@ class BrandProfileOut(BrandProfileBase):
 
 
 # ============================================================
-# USER VAULT SCHEMAS
-# ============================================================
-class UserVaultOut(BaseModel):
-    id: int
-    user_id: int
-    balance: float
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-# ============================================================
 # PROPERTY SCHEMAS
 # ============================================================
 class PropertyBase(BaseModel):
@@ -147,6 +134,47 @@ class BulkTapeOut(BaseModel):
     id: int
     domain_id: int
     file_url: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================
+# USER VAULT SCHEMAS
+# ============================================================
+class UserVaultOut(BaseModel):
+    id: int
+    user_id: int
+    balance: float
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+# ============================================================
+# BULK TAPE PROPERTY SCHEMAS
+# ============================================================
+from typing import Optional
+from datetime import datetime
+from pydantic import BaseModel
+
+class BulkTapePropertyBase(BaseModel):
+    bulk_tape_id: int     # link to BulkTapeOut
+    address: str
+    price: float
+    domain_id: int
+
+class BulkTapePropertyCreate(BulkTapePropertyBase):
+    pass
+
+class BulkTapePropertyUpdate(BaseModel):
+    bulk_tape_id: Optional[int] = None
+    address: Optional[str] = None
+    price: Optional[float] = None
+    domain_id: Optional[int] = None
+
+class BulkTapePropertyOut(BulkTapePropertyBase):
+    id: int
     created_at: datetime
 
     class Config:
