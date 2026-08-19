@@ -281,3 +281,32 @@ class LoanEstimateOut(LoanEstimateBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# CLOSING DISCLOSURE SCHEMAS
+# ============================================================
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+class ClosingDisclosureBase(BaseModel):
+    user_id: int
+    domain_id: int
+    property_id: int
+    loan_amount: float
+    closing_costs: float
+    cash_to_close: float
+
+class ClosingDisclosureCreate(ClosingDisclosureBase):
+    pass
+
+class ClosingDisclosureUpdate(BaseModel):
+    loan_amount: Optional[float] = None
+    closing_costs: Optional[float] = None
+    cash_to_close: Optional[float] = None
+
+class ClosingDisclosureOut(ClosingDisclosureBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
