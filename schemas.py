@@ -368,3 +368,26 @@ class DigitalAssetOut(DigitalAssetBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# BORROWER SCHEMAS
+# ============================================================
+from pydantic import BaseModel
+from datetime import datetime
+
+class BorrowerBase(BaseModel):
+    user_id: int
+    domain_id: int
+
+class BorrowerCreate(BorrowerBase):
+    pass
+
+class BorrowerUpdate(BaseModel):
+    user_id: int | None = None
+    domain_id: int | None = None
+
+class BorrowerOut(BorrowerBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
