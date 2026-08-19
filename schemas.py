@@ -391,3 +391,17 @@ class BorrowerOut(BorrowerBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# BORROWER RESPONSE SCHEMA
+# ============================================================
+from pydantic import BaseModel
+from datetime import datetime
+
+class BorrowerResponse(BaseModel):
+    id: int
+    user_id: int
+    domain_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
