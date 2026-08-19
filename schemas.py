@@ -208,3 +208,29 @@ class BulkTapePropertyOut(BulkTapePropertyBase):
 
     class Config:
         from_attributes = True
+# ============================================================
+# CREDIT REPORT SUMMARY SCHEMAS
+# ============================================================
+from pydantic import BaseModel
+from datetime import datetime
+
+class CreditReportSummaryBase(BaseModel):
+    user_id: int
+    domain_id: int
+    score: int
+    provider: str
+
+class CreditReportSummaryCreate(CreditReportSummaryBase):
+    pass
+
+class CreditReportSummaryUpdate(BaseModel):
+    score: int | None = None
+    provider: str | None = None
+
+class CreditReportSummaryOut(CreditReportSummaryBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
