@@ -604,3 +604,59 @@ model Organization {
   documents OwnerDocument[]
   Event     Event[]
 }
+model BluetoothEvent {
+  id           String   @id @default(cuid())
+  deviceId     String?  // browser/device identifier if available
+  name         String
+  timestamp    DateTime
+  userId       String?  // optional: link to user
+  sessionId    String?  // optional: link to behavior session
+  fingerprint String? // hashed identity
+  manufacturer String?
+  model        String?
+
+  // optional fields for future analytics
+  signalStrength Int?   // RSSI if you can capture it
+  metadata       Json?
+
+  createdAt    DateTime @default(now())
+}
+model LLPAGroup {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  priority    Int          @default(0)
+  active      Boolean      @default(true)
+
+  adjustments LLPAAdjustment[]
+}
+
+model LLPAAdjustment {
+  id          String     @id @default(cuid())
+  groupId     String
+  name        String
+  description String?
+  bps         Int        // positive or negative
+  active      Boolean    @default(true)
+
+  // core dimensions
+  minFico     Int?
+  maxFico     Int?
+  minLtv      Float?
+  maxLtv      Float?
+  occupancy   String?    // "owner", "second", "investment"
+  propertyType String?   // "SFR", "CONDO", "2-4", etc.
+  purpose     String?    // "purchase", "refi", "cashout"
+  loanType    String?    // "conv", "fha", "va", "nonqm"
+  termMonths  Int?
+  state       String?
+  firstTimeHomebuyer Boolean?
+
+  // behavior / bluetooth hooks (for later)
+  minImpulsivenessScore Int?
+  maxImpulsivenessScore Int?
+  requiresBluetoothPresence Boolean?
+
+  group LLPAGroup @relation(fields: [groupId], references: [id])
+}
+
