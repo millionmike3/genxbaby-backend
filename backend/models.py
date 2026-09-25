@@ -18,10 +18,11 @@ class User(Base):
     role = Column(String(50), nullable=False)
     domain_id = Column(Integer, ForeignKey("domains.id"), nullable=True)
     xp = Column(Integer, default=0)
+    digital_assets = relationship("DigitalAsset", back_populates="user")
     created_at = Column(DateTime, default=datetime.utcnow)
 
     domain = relationship("Domain", back_populates="users")
-    digital_assets = relationship("DigitalAsset", back_populates="user")
+   
 
 
 
