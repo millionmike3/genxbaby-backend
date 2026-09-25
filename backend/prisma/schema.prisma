@@ -659,4 +659,24 @@ model LLPAAdjustment {
 
   group LLPAGroup @relation(fields: [groupId], references: [id])
 }
+model LlpaGridRow {
+  id           Int      @id @default(autoincrement())
+  agency       String   // 'FNMA' | 'FHLMC'
+  productType  String   // 'FIXED' | 'ARM'
+  occupancy    String   // 'OWNER' | 'INVESTMENT' | 'SECOND'
+  propertyType String   // 'SFR' | 'CONDO' | 'TWO_TO_FOUR'
+  purpose      String   // 'PURCHASE' | 'RATE_TERM' | 'CASHOUT'
+  ficoBucket   Int
+  ltvBucket    Int
+  adjustment   Float    // rate add, e.g. 0.250
+}
+model InvestorPricingSheet {
+  id          Int      @id @default(autoincrement())
+  investorId  Int
+  name        String
+  effectiveAt DateTime
+  baseSpread  Float
+  llpaFactor  Float
+  active      Boolean  @default(true)
+}
 

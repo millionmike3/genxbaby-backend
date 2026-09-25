@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                  // modern JS output
+    "module": "commonjs",                // Node.js module system
+    "rootDir": "src",                    // where your TS source files live
+    "outDir": "dist",                    // compiled JS output
+    "strict": true,                      // enable strict type checking
+    "esModuleInterop": true,             // allow default imports from CommonJS
+    "skipLibCheck": true,                // skip type checks of dependencies
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"],                    // compile everything in src/
+  "exclude": ["node_modules", "dist"]    // ignore these folders
+}
