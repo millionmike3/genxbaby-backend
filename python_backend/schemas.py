@@ -410,3 +410,30 @@ class MerkleAnchorRequest(BaseModel):
     anchor: str
     tape_id: int
 
+class MerkleAnchorOut(BaseModel):
+    tape_id: int
+    anchor: str
+    merkle_root: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class BulkTapeBase(BaseModel):
+    domain_id: int
+    file_url: str
+
+class BulkTapeCreate(BulkTapeBase):
+    pass
+
+class AdminStatsOut(BaseModel):
+    total_users: int
+    total_domains: int
+    total_properties: int
+    total_bulk_tapes: int
+
+    class Config:
+        from_attributes = True
+
+
+
