@@ -1,5 +1,5 @@
-from backend.database import Base, engine, SessionLocal
-from backend.models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
+from backend.backend.database import Base, engine, SessionLocal
+from backend.backend.models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
 from backend.schemas import (
     UserCreate,
     UserLogin,
@@ -31,7 +31,7 @@ from backend.schemas import (
     BorrowerCreate,
     BorrowerResponse
 )
-from backend.rbac import get_current_user
+from backend.backend.rbac import get_current_user
 from backend.routers.domains import router as domains_router
 from backend.routers.owners import router as owners_router
 from backend.routers.investors import router as investors_router
