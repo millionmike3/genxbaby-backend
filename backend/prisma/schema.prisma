@@ -679,4 +679,51 @@ model InvestorPricingSheet {
   llpaFactor  Float
   active      Boolean  @default(true)
 }
+model LlpaGrid {
+  id           Int      @id @default(autoincrement())
+  investor     String
+  productType  String   // e.g. "FRM30", "ARM5/1"
+  purpose      String   // "purchase", "refinance", "cashout"
+  occupancy    String   // "owner", "nonowner"
+  ficoMin      Int
+  ficoMax      Int
+  ltvMin       Float
+  ltvMax       Float
+  termMonths   Int
+  llpaBps      Int
+  createdAt    DateTime @default(now())
+}
+model UnderwritingAssetSnapshot {
+  id                  Int      @id @default(autoincrement())
+  ownerId             Int
+  propertyId          Int
+  mortgageAssetId     Int?
+  assetQualityScore   Int
+  cashflowScore       Int
+  riskScore           Int
+  diversificationImpact Int
+  valuationJson       Json
+  createdAt           DateTime @default(now())
+}
+
+model UnderwritingDecision {
+  id              Int      @id @default(autoincrement())
+  loanId          Int
+  decision        String   // "approve", "decline", "conditional"
+  reasonCodesJson Json
+  pricingScenarioId Int?
+  riskSnapshotId  Int?
+  createdAt       DateTime @default(now())
+}
+
+model RiskSnapshot {
+  id              Int      @id @default(autoincrement())
+  loanId          Int
+  ltv             Float
+  dscr            Float
+  riskScore       Int
+  delinquencyJson Json
+  marketJson      Json
+  createdAt       DateTime @default(now())
+}
 
