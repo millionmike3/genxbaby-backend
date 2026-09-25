@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from schemas import (
+from python_backend.schemas import (
     UserCreate, UserLogin, UserOut,
     DomainCreate, DomainOut,
     PropertyCreate, PropertyOut,
@@ -10,14 +10,14 @@ from schemas import (
     MerkleAnchorRequest, MerkleAnchorOut,
     AdminStatsOut,
 )
-from models import Base
+from python_backend.models import Base
 from services import (
     create_user, create_domain, create_property,
     create_bulk_tape, link_property_to_bulk_tape,
     anchor_bulk_tape, get_admin_stats,
     verify_password,
 )
-from database import get_db  # you define engine/session in database.py
+from python_backend.database import get_db  # you define engine/session in database.py
 
 app = FastAPI()
 
