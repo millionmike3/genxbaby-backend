@@ -1,6 +1,6 @@
-from backend.database import Base, engine, SessionLocal
-from backend.models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
-from backend.schemas import (
+from python-backend.database import Base, engine, SessionLocal
+from python-backend.models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
+from python-backend.schemas import (
     UserCreate,
     UserLogin,
     XPUpdate,
@@ -31,18 +31,18 @@ from backend.schemas import (
     BorrowerCreate,
     BorrowerResponse
 )
-from backend.rbac import get_current_user
-from backend.routes import router
-from backend.routers.domains import router as domains_router
-from backend.routers.owners import router as owners_router
-from backend.routers.investors import router as investors_router
-from backend.routers.borrowers import router as borrowers_router
-from backend.routers.mortgage import router as mortgage_router
-from backend.routers.property_sanitizer import router as property_router
-from backend.routers.bulk_tape import router as bulk_tape_router
-from backend.routers.credit import router as credit_router
-from backend.routers.underwriting import router as underwriting_router
-from backend.routers.panels import router as panels_router
+from python-backend.rbac import get_current_user
+from python-backend.routes import router
+from python-backend.routers.domains import router as domains_router
+from python-backend.routers.owners import router as owners_router
+from python-backend.routers.investors import router as investors_router
+from python-backend.routers.borrowers import router as borrowers_router
+from python-backend.routers.mortgage import router as mortgage_router
+from python-backend.routers.property_sanitizer import router as property_router
+from python-backend.routers.bulk_tape import router as bulk_tape_router
+from python-backend.routers.credit import router as credit_router
+from python-backend.routers.underwriting import router as underwriting_router
+from python-backend.routers.panels import router as panels_router
 
 
 # ============================================================
