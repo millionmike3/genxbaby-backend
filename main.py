@@ -1,11 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from datetime import datetime
-
-from database import Base, engine, SessionLocal
-from models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
-from schemas import (
+from backend.database import Base, engine, SessionLocal
+from backend.models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
+from backend.schemas import (
     UserCreate,
     UserLogin,
     XPUpdate,
@@ -36,20 +31,17 @@ from schemas import (
     BorrowerCreate,
     BorrowerResponse
 )
-
-from rbac import get_current_user
-
-# Routers
-from routers.domains import router as domains_router
-from routers.owners import router as owners_router
-from routers.investors import router as investors_router
-from routers.borrowers import router as borrowers_router
-from routers.mortgage import router as mortgage_router
-from routers.property_sanitizer import router as property_router
-from routers.bulk_tape import router as bulk_tape_router
-from routers.credit import router as credit_router
-from routers.underwriting import router as underwriting_router
-from routers.panels import router as panels_router
+from backend.rbac import get_current_user
+from backend.routers.domains import router as domains_router
+from backend.routers.owners import router as owners_router
+from backend.routers.investors import router as investors_router
+from backend.routers.borrowers import router as borrowers_router
+from backend.routers.mortgage import router as mortgage_router
+from backend.routers.property_sanitizer import router as property_router
+from backend.routers.bulk_tape import router as bulk_tape_router
+from backend.routers.credit import router as credit_router
+from backend.routers.underwriting import router as underwriting_router
+from backend.routers.panels import router as panels_router
 
 
 # ============================================================
