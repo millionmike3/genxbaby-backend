@@ -21,6 +21,8 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     domain = relationship("Domain", back_populates="users")
+    digital_assets = relationship("DigitalAsset", back_populates="user")
+
 
 
 class Domain(Base):
@@ -111,3 +113,17 @@ class BulkTapeProperty(Base):
 
     bulk_tape = relationship("BulkTape", back_populates="properties")
     property = relationship("Property", back_populates="bulk_tape_links")
+
+class DigitalAsset(Base):
+    __tablename__ = "digital_assets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    asset_type = Column(String(255), nullable=False)
+    identifier = Column(String(255), nullable=False)
+    asset_metadata = Column(Text, nullable=True)
+    estimated_value = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="digital_assets")
+
