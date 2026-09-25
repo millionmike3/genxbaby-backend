@@ -5,11 +5,10 @@ from python_backend.schemas import (
     UserCreate, UserLogin, UserOut,
     DomainCreate, DomainOut,
     PropertyCreate, PropertyOut,
-    BulkTapeCreate, BulkTapeOut,
-    BulkTapePropertyCreate, BulkTapePropertyOut,
-    MerkleAnchorRequest, MerkleAnchorOut,
-    AdminStatsOut,
-)
+    BulkTapeOut, BulkTapePropertyCreate, 
+    BulkTapePropertyOut, MerkleAnchorRequest,
+    MerkleAnchorOut, AdminStatsOut,
+) 
 from python_backend.models import Base
 from services import (
     create_user, create_domain, create_property,
