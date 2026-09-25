@@ -405,3 +405,8 @@ class BorrowerResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class MerkleAnchorRequest(BaseModel):
+    anchor: str
+    tape_id: int
+
