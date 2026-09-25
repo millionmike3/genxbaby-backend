@@ -5,25 +5,28 @@ from python_backend.schemas import (
     UserCreate, UserLogin, UserOut,
     DomainCreate, DomainOut,
     PropertyCreate, PropertyOut,
-    BulkTapeOut, BulkTapePropertyCreate, 
-    BulkTapePropertyOut, MerkleAnchorRequest,
-    MerkleAnchorOut, AdminStatsOut,
-) 
+    BulkTapeCreate, BulkTapeOut,
+    BulkTapePropertyCreate, BulkTapePropertyOut,
+    MerkleAnchorRequest, MerkleAnchorOut,
+    AdminStatsOut,
+)
+
 from python_backend.models import Base
-from services import (
+from python_backend.database import get_db
+
+from python_backend.services import (
     create_user, create_domain, create_property,
     create_bulk_tape, link_property_to_bulk_tape,
     anchor_bulk_tape, get_admin_stats,
     verify_password,
 )
-from python_backend.database import get_db  # you define engine/session in database.py
 
 app = FastAPI()
 
 
 @app.on_event("startup")
 def startup():
-    from database import engine
+    from python_backend.database import engine
     Base.metadata.create_all(bind=engine)
 
 
@@ -32,16 +35,17 @@ def startup():
 # =========================
 @app.post("/users", response_model=UserOut)
 def api_create_user(data: UserCreate, db: Session = Depends(get_db)):
-    user = create_user(db, data)
-    return user
+    return create_user(db, data)
 
 
 @app.post("/login")
 def api_login(data: UserLogin, db: Session = Depends(get_db)):
-    from models import User
+    from python_backend.models import User
     user = db.query(User).filter(User.username == data.username).first()
+
     if not user or not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+
     return {"user_id": user.id, "role": user.role}
 
 
@@ -50,8 +54,7 @@ def api_login(data: UserLogin, db: Session = Depends(get_db)):
 # =========================
 @app.post("/domains", response_model=DomainOut)
 def api_create_domain(data: DomainCreate, db: Session = Depends(get_db)):
-    domain = create_domain(db, data)
-    return domain
+    return create_domain(db, data)
 
 
 # =========================
@@ -59,8 +62,7 @@ def api_create_domain(data: DomainCreate, db: Session = Depends(get_db)):
 # =========================
 @app.post("/properties", response_model=PropertyOut)
 def api_create_property(data: PropertyCreate, db: Session = Depends(get_db)):
-    prop = create_property(db, data)
-    return prop
+    return create_property(db, data)
 
 
 # =========================
@@ -68,27 +70,20 @@ def api_create_property(data: PropertyCreate, db: Session = Depends(get_db)):
 # =========================
 @app.post("/bulk-tapes", response_model=BulkTapeOut)
 def api_create_bulk_tape(data: BulkTapeCreate, db: Session = Depends(get_db)):
-    tape = create_bulk_tape(db, data)
-    return tape
+    return create_bulk_tape(db, data)
 
 
 @app.post("/bulk-tape-properties", response_model=BulkTapePropertyOut)
-def api_link_property_to_tape(
-    data: BulkTapePropertyCreate, db: Session = Depends(get_db)
-):
-    link = link_property_to_bulk_tape(db, data)
-    return link
+def api_link_property_to_tape(data: BulkTapePropertyCreate, db: Session = Depends(get_db)):
+    return link_property_to_bulk_tape(db, data)
 
 
 @app.post("/bulk-tapes/anchor", response_model=MerkleAnchorOut)
-def api_anchor_bulk_tape(
-    req: MerkleAnchorRequest, db: Session = Depends(get_db)
-):
+def api_anchor_bulk_tape(req: MerkleAnchorRequest, db: Session = Depends(get_db)):
     try:
-        result = anchor_bulk_tape(db, req)
+        return anchor_bulk_tape(db, req)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
-    return result
 
 
 # =========================

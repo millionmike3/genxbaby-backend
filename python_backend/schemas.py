@@ -423,8 +423,10 @@ class BulkTapeBase(BaseModel):
     domain_id: int
     file_url: str
 
-class BulkTapeCreate(BulkTapeBase):
-    pass
+class BulkTapeCreate(BaseModel):
+    domain_id: int
+    file_url: str
+
 
 class AdminStatsOut(BaseModel):
     total_users: int
