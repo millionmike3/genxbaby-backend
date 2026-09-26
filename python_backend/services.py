@@ -5,17 +5,16 @@ from passlib.context import CryptContext
 from python_backend.models import (
     User, Domain, Property, BulkTape, BulkTapeProperty, UserVault
 )
-
 from python_backend.schemas import (
     UserCreate, DomainCreate, PropertyCreate,
     BulkTapeCreate, BulkTapePropertyCreate,
     MerkleAnchorRequest, MerkleAnchorOut
 )
-
 from python_backend.merkle import build_merkle_root_for_properties
 from python_backend.blockchain import anchor_merkle_root_on_polygon
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 
 def hash_password(password: str) -> str:

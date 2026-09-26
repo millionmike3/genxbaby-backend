@@ -6,3 +6,4 @@ reportlab
 python-multipart
 psycopg[binary]
 passlib[bcrypt]
+web3
