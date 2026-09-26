@@ -144,5 +144,25 @@ def get_brand(domain: str, db: Session = Depends(get_db)):
 # USER VAULT
 # ============================================================
 @app.get("/vault/me", response_model=UserVaultOut)
-def my_vault(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    vault = db.query(UserVault).filter(UserVault.user_id
+def my_vault(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    vault = db.query(UserVault).filter(UserVault.user_id == current_user.id).first()
+    if not vault:
+        raise HTTPException(404, "Vault not found")
+    return vault
+
+# ============================================================
+# INCLUDE MODULE ROUTERS
+# ============================================================
+app.include_router(domains_router)
+app.include_router(owners_router)
+app.include_router(investors_router)
+app.include_router(borrowers_router)
+app.include_router(mortgage_router)
+app.include_router(property_router)
+app.include_router(bulk_tape_router)
+app.include_router(credit_router)
+app.include_router(underwriting_router)
+app.include_router(panels_router)

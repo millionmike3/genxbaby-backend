@@ -23,7 +23,6 @@ class Property(Base):
 
     market_value = Column(Float, nullable=True)
     valuation_confidence = Column(Float, nullable=True)
-
     cap_rate = Column(Float, nullable=True)
     noi = Column(Float, nullable=True)
     dscr = Column(Float, nullable=True)
@@ -36,5 +35,3 @@ class Property(Base):
     owner = relationship("Owner", back_populates="properties")
     mortgages = relationship("Mortgage", back_populates="property")
     applications = relationship("MortgageApplication", back_populates="property")
-
-
