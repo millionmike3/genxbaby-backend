@@ -35,4 +35,6 @@ class Property(Base):
 
     owner = relationship("Owner", back_populates="properties")
     mortgages = relationship("Mortgage", back_populates="property")
+    applications = relationship("MortgageApplication", back_populates="property")
+
 

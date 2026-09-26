@@ -18,10 +18,15 @@ class Mortgage(Base):
     term_months = Column(Integer, nullable=True)
 
     status = Column(String, default="PENDING")  # PENDING / APPROVED / DECLINED
+
     underwriting_case_id = Column(Integer, ForeignKey("underwriting_cases.id"))
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    # Relationships
     borrower = relationship("Borrower", back_populates="mortgages")
     property = relationship("Property", back_populates="mortgages")
     underwriting_case = relationship("UnderwritingCase", back_populates="mortgage")
+
+    # NEW: Link to MortgageApplication
+    application = relationship("MortgageApplication", back_populates="mortgage", uselist=False)

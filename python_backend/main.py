@@ -1,38 +1,12 @@
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from datetime import datetime
+
 from python_backend.database import Base, engine, SessionLocal
-from python_backend.models import User, BrandProfile, UserVault, DigitalAsset, Borrower, Domain
-from python_backend.schemas import (
-    UserCreate,
-    UserLogin,
-    XPUpdate,
-    UserOut,
-    DomainCreate,
-    DomainOut,
-    InvestorOut,
-    BorrowerOut,
-    BrandProfileCreate,
-    BrandProfileUpdate,
-    BrandProfileOut,
-    UserVaultOut,
-    PropertyCreate,
-    PropertyOut,
-    BulkTapeOut,
-    BulkTapePropertyOut,
-    CreditReportSummaryOut,
-    MortgageApplicationCreate,
-    MortgageApplicationOut,
-    SignalOut,
-    ProofOfFundsOut,
-    LoanEstimateCreate,
-    LoanEstimateOut,
-    ClosingDisclosureOut,
-    DisbursementCheckOut,
-    DigitalAssetCreate,
-    DigitalAssetOut,
-    BorrowerCreate,
-    BorrowerResponse
-)
 from python_backend.rbac import get_current_user
-from python_backend.routes import app
+
+# Routers
 from python_backend.routers.domains import router as domains_router
 from python_backend.routers.owners import router as owners_router
 from python_backend.routers.investors import router as investors_router
@@ -44,13 +18,23 @@ from python_backend.routers.credit import router as credit_router
 from python_backend.routers.underwriting import router as underwriting_router
 from python_backend.routers.panels import router as panels_router
 
+# Models
+from python_backend.models import User, BrandProfile, UserVault, DigitalAsset
+
+# Schemas
+from python_backend.schemas import (
+    UserCreate, UserLogin, UserOut,
+    BrandProfileCreate, BrandProfileOut,
+    UserVaultOut,
+    DigitalAssetCreate, DigitalAssetOut,
+)
 
 # ============================================================
 # APP INIT
 # ============================================================
 app = FastAPI(
     title="Resilient America Lending OS",
-    description="Multi-tenant mortgage + property underwriting platform for investors, owners, and borrowers.",
+    description="Multi-tenant mortgage + property underwriting platform.",
     version="1.0.0",
 )
 
@@ -63,8 +47,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Create tables
 Base.metadata.create_all(bind=engine)
-
 
 # ============================================================
 # DB DEPENDENCY
@@ -75,7 +59,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
 
 # ============================================================
 # ROOT
@@ -98,7 +81,6 @@ def root():
             "panels",
         ],
     }
-
 
 # ============================================================
 # AUTH / USERS
@@ -123,27 +105,22 @@ def register_user(data: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-    # Create empty vault
     vault = UserVault(user_id=user.id)
     db.add(vault)
     db.commit()
 
     return user
 
-
 @app.post("/auth/login", response_model=UserOut)
 def login(data: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == data.username).first()
     if not user or user.password_hash != data.password:
         raise HTTPException(401, "Invalid credentials")
-
     return user
-
 
 @app.get("/auth/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
-
 
 # ============================================================
 # BRAND PROFILE
@@ -156,7 +133,6 @@ def create_brand(data: BrandProfileCreate, db: Session = Depends(get_db)):
     db.refresh(brand)
     return brand
 
-
 @app.get("/brand/{domain}", response_model=BrandProfileOut)
 def get_brand(domain: str, db: Session = Depends(get_db)):
     brand = db.query(BrandProfile).filter(BrandProfile.domain == domain).first()
@@ -164,58 +140,9 @@ def get_brand(domain: str, db: Session = Depends(get_db)):
         raise HTTPException(404, "Brand not found")
     return brand
 
-
 # ============================================================
 # USER VAULT
 # ============================================================
 @app.get("/vault/me", response_model=UserVaultOut)
 def my_vault(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    vault = db.query(UserVault).filter(UserVault.user_id == current_user.id).first()
-    if not vault:
-        raise HTTPException(404, "Vault not found")
-    return vault
-
-
-# ============================================================
-# DIGITAL ASSETS
-# ============================================================
-@app.post("/digital-assets", response_model=DigitalAssetOut)
-def add_digital_asset(
-    data: DigitalAssetCreate,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    asset = DigitalAsset(
-        user_id=current_user.id,
-        asset_type=data.asset_type,
-        identifier=data.identifier,
-        asset_metadata=data.asset_metadata,
-        estimated_value=0,
-    )
-    db.add(asset)
-    db.commit()
-    db.refresh(asset)
-    return asset
-
-
-@app.get("/digital-assets", response_model=list[DigitalAssetOut])
-def list_digital_assets(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    return db.query(DigitalAsset).filter(DigitalAsset.user_id == current_user.id).all()
-
-
-# ============================================================
-# INCLUDE MODULE ROUTERS
-# ============================================================
-app.include_router(domains_router)
-app.include_router(owners_router)
-app.include_router(investors_router)
-app.include_router(borrowers_router)
-app.include_router(mortgage_router)
-app.include_router(property_router)
-app.include_router(bulk_tape_router)
-app.include_router(credit_router)
-app.include_router(underwriting_router)
-app.include_router(panels_router)
+    vault = db.query(UserVault).filter(UserVault.user_id

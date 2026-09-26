@@ -32,5 +32,15 @@ class Borrower(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    applications = relationship("MortgageApplication", back_populates="borrower")
+
+
     mortgages = relationship("Mortgage", back_populates="borrower")
     underwriting_cases = relationship("UnderwritingCase", back_populates="borrower")
+
+    mortgage_applications = relationship(
+    "MortgageApplication",
+    back_populates="borrower",
+    cascade="all, delete-orphan"
+)
+
