@@ -11,8 +11,8 @@ from python_backend.schemas import (
     AdminStatsOut,
 )
 
-from python_backend.models import Base
-from python_backend.database import get_db
+from python_backend.database import get_db, engine
+from python_backend.models import Base, User
 
 from python_backend.services import (
     create_user, create_domain, create_property,
@@ -25,7 +25,6 @@ app = FastAPI()
 
 @app.on_event("startup")
 def startup():
-    from python_backend.database import engine
     Base.metadata.create_all(bind=engine)
 
 # AUTH
@@ -35,7 +34,6 @@ def api_create_user(data: UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/login")
 def api_login(data: UserLogin, db: Session = Depends(get_db)):
-    from python_backend.models import User
     user = db.query(User).filter(User.username == data.username).first()
     if not user or not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
