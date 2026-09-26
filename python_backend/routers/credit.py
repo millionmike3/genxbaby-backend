@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from database import SessionLocal
-from models import Borrower, MortgageApplication, CreditReportSummary
-from schemas import CreditReportSummaryOut
-from rbac import require_admin, require_owner, require_borrower
-from signals import compute_borrower_signal
+from python_backend.database import SessionLocal
+from python_backend.models import Borrower, MortgageApplication, CreditReportSummary
+from python_backend.schemas import CreditReportSummaryOut
+from python_backend.rbac import require_admin, require_owner, require_borrower
+from python_backend.signals import compute_borrower_signal
 
 
 router = APIRouter(prefix="/credit", tags=["Credit Bureau"])

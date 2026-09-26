@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
-from models import User
+from python_backend.database import get_db
+from python_backend.models import User
 
 router = APIRouter(prefix="/leaderboard", tags=["Leaderboard"])
 

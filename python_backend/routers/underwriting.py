@@ -2,16 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from database import SessionLocal
-from models import (
+from python_backend.database import SessionLocal
+from python_backend.models import (
     MortgageApplication,
     Borrower,
     Property,
     UserVault,
     CreditReportSummary,
 )
-from rbac import require_owner, require_admin
-from signals import compute_ultra_favorable_signal
+from python_backend.rbac import require_owner, require_admin
+from python_backend.signals import compute_ultra_favorable_signal
 
 
 router = APIRouter(prefix="/underwriting", tags=["Underwriting"])

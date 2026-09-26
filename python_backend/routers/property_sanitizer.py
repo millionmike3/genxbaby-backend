@@ -4,22 +4,22 @@ import csv
 import io
 from datetime import datetime
 
-from database import SessionLocal
-from models import (
+from python_backend.database import SessionLocal
+from python_backend.models import (
     Property,
     BulkTape,
     BulkTapeProperty,
     Investor,
     Domain,
 )
-from schemas import (
+from python_backend.schemas import (
     PropertyCreate,
     PropertyOut,
     BulkTapeOut,
     BulkTapePropertyOut,
 )
-from signals import compute_property_signal
-from rbac import require_investor, require_owner, require_admin
+from python_backend.signals import compute_property_signal
+from python_backend.rbac import require_investor, require_owner, require_admin
 
 
 router = APIRouter(prefix="/property", tags=["Property Sanitizer"])

@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from database import get_db
-from models import Borrower  # adjust if your model name differs
-from schemas import BorrowerCreate, BorrowerResponse  # if you use Pydantic schemas
+from python_backend.database import get_db
+from python_backend.models import Borrower  # adjust if your model name differs
+from python_backend.schemas import BorrowerCreate, BorrowerResponse  # if you use Pydantic schemas
 
 router = APIRouter(
     prefix="/borrowers",

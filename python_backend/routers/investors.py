@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from database import SessionLocal
-from models import User, Investor, MortgageApplication, Property, Domain
-from schemas import InvestorOut, UserCreate, UserOut
-from rbac import require_admin, require_owner, require_investor
+from python_backend.database import SessionLocal
+from python_backend.models import User, Investor, MortgageApplication, Property, Domain
+from python_backend.schemas import InvestorOut, UserCreate, UserOut
+from python_backend.rbac import require_admin, require_owner, require_investor
 
 
 router = APIRouter(prefix="/investors", tags=["Investors"])

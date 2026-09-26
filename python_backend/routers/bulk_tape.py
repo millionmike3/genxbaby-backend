@@ -4,7 +4,7 @@ import csv
 import io
 from datetime import datetime
 
-from database import SessionLocal
+from python_backend.database import SessionLocal
 from models import BulkTape, BulkTapeProperty, Property
 from schemas import BulkTapeOut, BulkTapePropertyOut
 from signals import compute_property_signal_from_dict

@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from database import SessionLocal
-from models import Domain, User, BrandProfile
-from schemas import DomainCreate, DomainOut
-from rbac import require_admin, require_owner
+from python_backend.database import SessionLocal
+from python_backend.models import Domain, User, BrandProfile
+from python_backend.schemas import DomainCreate, DomainOut
+from python_backend.rbac import require_admin, require_owner
 
 
 router = APIRouter(prefix="/domains", tags=["Domains"])
