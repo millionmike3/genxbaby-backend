@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
-from src.database import Base
+from python_backend.database import Base
 
 
 class Mortgage(Base):

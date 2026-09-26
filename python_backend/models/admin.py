@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime
-from backend.database import Base
+from python_backend.database import Base
 
 class Admin(Base):
     __tablename__ = "admins"

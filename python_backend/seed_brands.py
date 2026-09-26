@@ -1,5 +1,5 @@
-from database import SessionLocal, Base, engine
-from models import BrandProfile
+from python_backend.database import SessionLocal, Base, engine
+from python_backend.models import BrandProfile
 
 Base.metadata.create_all(bind=engine)
 

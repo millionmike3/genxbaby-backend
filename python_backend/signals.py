@@ -111,7 +111,7 @@ def anchor_bulk_tape(db: Session, req: MerkleAnchorRequest) -> MerkleAnchorOut:
 
     return MerkleAnchorOut(
         tape_id=tape.id,
-        anchor=tx_hash,
+        anchor=req.anchor,
         merkle_root=merkle_root,
         created_at=tape.anchored_at,
     )

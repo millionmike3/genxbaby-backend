@@ -5,3 +5,4 @@ pydantic
 reportlab
 python-multipart
 psycopg[binary]
+passlib[bcrypt]

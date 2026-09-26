@@ -1,11 +1,11 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from datetime import datetime
 
-from src.database import Base
+from python_backend.database import Base
 
 
-class Investor(Base):
-    __tablename__ = "investors"
+class Owner(Base):
+    __tablename__ = "owners"
 
     id = Column(Integer, primary_key=True, index=True)
 
@@ -13,11 +13,10 @@ class Investor(Base):
     last_name = Column(String, nullable=False)
     email = Column(String, nullable=False)
 
-    total_invested = Column(Float, default=0.0)
-    total_returns = Column(Float, default=0.0)
-    active_positions = Column(Integer, default=0)
-
-    risk_tolerance = Column(String, nullable=True)
-    investment_strategy = Column(String, nullable=True)
+    total_properties = Column(Integer, default=0)
+    total_equity = Column(Float, default=0.0)
+    total_cashflow = Column(Float, default=0.0)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
+properties = relationship("Property", back_populates="owner")
