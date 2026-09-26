@@ -32,7 +32,7 @@ from python_backend.schemas import (
     BorrowerResponse
 )
 from python_backend.rbac import get_current_user
-from python_backend.routes import router
+from python_backend.routes import app
 from python_backend.routers.domains import router as domains_router
 from python_backend.routers.owners import router as owners_router
 from python_backend.routers.investors import router as investors_router
