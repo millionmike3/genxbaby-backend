@@ -1,12 +1,10 @@
-export class AlertRulesService {
-  evaluate(alert: any) {
-    // rule logic
-  }
-}
 
+export class AlertRulesService {
+  evaluate(owner: any) {
+    const alerts: any[] = [];
 
     // Rule 1 — Multiple SAR reports
-    if (owner.sarReports.length >= 2) {
+    if (owner.suspiciousActivityReport?.length >= 2) {
       alerts.push({
         type: 'MULTIPLE_SAR',
         severity: 'CRITICAL',
@@ -24,7 +22,7 @@ export class AlertRulesService {
     }
 
     // Rule 3 — Device anomaly
-    if (owner.devices.length >= 4) {
+    if (owner.ownerDevice?.length >= 4) {
       alerts.push({
         type: 'DEVICE_ANOMALY',
         severity: 'MEDIUM',
@@ -33,21 +31,24 @@ export class AlertRulesService {
     }
 
     // Rule 4 — Routing cluster
-    if (owner.accounts.length >= 2) {
-      const routingNumbers = owner.accounts.map(a => a.routingNumber);
-      const unique = new Set(routingNumbers);
-      if (unique.size < routingNumbers.length) {
-        alerts.push({
-          type: 'ROUTING_CLUSTER',
-          severity: 'HIGH',
-          message: 'Owner shares routing numbers with other accounts.',
-        });
-      }
+    const routingNumbers = owner.ownerAccount?.map((a: any) => a.routingNumber) || [];
+    const unique = new Set(routingNumbers);
+
+    if (unique.size < routingNumbers.length) {
+      alerts.push({
+        type: 'ROUTING_CLUSTER',
+        severity: 'HIGH',
+        message: 'Owner shares routing numbers with other accounts.',
+      });
     }
 
     // Rule 5 — Document fraud
-    const docFraudScores = owner.documents.flatMap(d => d.fraudResults.map(r => r.fraudScore));
-    const maxDocFraud = Math.max(...docFraudScores, 0);
+    const docFraudScores =
+      owner.ownerDocument?.flatMap((d: any) =>
+        d.documentFraudResult.map((r: any) => r.fraudScore),
+      ) || [];
+
+    const maxDocFraud = docFraudScores.length ? Math.max(...docFraudScores) : 0;
 
     if (maxDocFraud >= 70) {
       alerts.push({

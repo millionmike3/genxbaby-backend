@@ -4,8 +4,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
+
+
 
 //
 // ─────────────────────────────────────────────────────────────
@@ -726,4 +727,28 @@ model RiskSnapshot {
   marketJson      Json
   createdAt       DateTime @default(now())
 }
+model SarReport {
+  id      String @id @default(uuid())
+  ownerId String
+}
+model Device {
+  id      String @id @default(uuid())
+  ownerId String
+}
+model Account {
+  id            String @id @default(uuid())
+  ownerId       String
+  routingNumber String
+}
+model Document {
+  id          String @id @default(uuid())
+  ownerId     String
+  fraudResults FraudResult[]
+}
+model FraudResult {
+  id         String @id @default(uuid())
+  documentId String
+  fraudScore Int
 
+  document   Document @relation(fields: [documentId], references: [id])
+}

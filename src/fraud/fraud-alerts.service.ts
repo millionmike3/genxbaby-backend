@@ -10,7 +10,8 @@ export class FraudAlertsService {
   ) {}
 
   async generateAlerts(ownerId: string) {
-    const alerts = await this.trigger.run(ownerId);
+    const alerts = await this.trigger.generateAlertsForOwner(ownerId);
+
 
     for (const alert of alerts) {
       await this.dispatcher.dispatch(alert);
