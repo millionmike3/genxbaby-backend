@@ -19,7 +19,7 @@ from python_backend.routers.underwriting import router as underwriting_router
 from python_backend.routers.panels import router as panels_router
 
 # Models
-from python_backend.models import User, BrandProfile, UserVault, DigitalAsset
+from python_backend.models.users import User, BrandProfile, UserVault, DigitalAsset
 
 # Schemas
 from python_backend.schemas import (

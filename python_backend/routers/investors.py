@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from python_backend.database import SessionLocal
-from python_backend.models import User, Investor, MortgageApplication, Property, Domain
+from python_backend.models.users import User, Investor, MortgageApplication, Property, Domain
 from python_backend.schemas import InvestorOut, UserCreate, UserOut
 from python_backend.rbac import require_admin, require_owner, require_investor
 

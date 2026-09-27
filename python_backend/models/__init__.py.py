@@ -1,7 +1,7 @@
 from python_backend.database import Base
 
 # Core user + auth models
-from python_backend.models.user import User
+from python_backend.models.users import User
 from python_backend.models.brand_profile import BrandProfile
 from python_backend.models.user_vault import UserVault
 from python_backend.models.digital_asset import DigitalAsset
