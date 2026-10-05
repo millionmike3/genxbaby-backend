@@ -2,17 +2,16 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# 1. Copy ONLY backend package files FIRST
-COPY backend/package*.json ./
+# Copy ONLY the correct package.json (the one inside backend/backend)
+COPY backend/backend/package*.json ./
 
-# 2. Install dependencies
 RUN npm install
 
-# 3. Copy backend source AFTER dependencies
-COPY backend/. .
+# Copy the actual backend source
+COPY backend/backend/. .
 
-# 4. Build TypeScript → dist/
+# Build TypeScript → dist/
 RUN npm run build
 
-# 5. Start the compiled app
+# Start the compiled app
 CMD ["npm", "run", "start"]
