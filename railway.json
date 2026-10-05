@@ -1,0 +1,9 @@
+{
+  "services": {
+    "genxbaby-backend": {
+      "startCommand": "npm run start --prefix genxbaby-backend",
+      "rootDirectory": "."
+    }
+  }
+}
+
