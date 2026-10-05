@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2017",                  // modern JS output
-    "module": "commonjs",                // Node.js module system
-    "rootDir": "src",                    // where your TS source files live
-    "outDir": "dist",                    // compiled JS output
-    "strict": false,                      // enable strict type checking
-    "esModuleInterop": true,             // allow default imports from CommonJS
-    "skipLibCheck": true,                // skip type checks of dependencies
-    "forceConsistentCasingInFileNames": true,
-   "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "useDefineForClassFields": false,
-    
+    "module": "commonjs",
+    "target": "es2017",
+    "strict": true,
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "*": ["./*"]
+    },
+    "incremental": true,
+    "skipLibCheck": true
   },
-  "include": ["src"],                    // compile everything in src/
-  "exclude": ["node_modules", "dist"]    // ignore these folders
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
