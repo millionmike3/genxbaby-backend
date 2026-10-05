@@ -6,10 +6,13 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "rootDir": "./src",
+    "paths": {
+      "*": ["./*"]
+    },
     "incremental": true,
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "../frontend"]
+  "exclude": ["node_modules", "dist"]
 }
