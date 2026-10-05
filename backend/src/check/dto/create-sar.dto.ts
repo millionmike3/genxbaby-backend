@@ -10,4 +10,6 @@ export class CreateSarDto {
   @IsString()
   severity: string;
 
-  @Is
+  @IsString()
+  type: string;   // or message, or summary — depending on your schema
+}
