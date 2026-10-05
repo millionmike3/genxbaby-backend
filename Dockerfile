@@ -2,11 +2,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy ONLY the backend folder's package.json
+COPY backend/package*.json ./
+
 RUN npm install
 
-COPY . .
+# Copy ONLY the backend folder's source code
+COPY backend/. .
 
 RUN npm run build
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:prod"]
