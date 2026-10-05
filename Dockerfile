@@ -2,14 +2,16 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy ONLY the backend folder's package.json
+# Copy only backend package files
 COPY backend/package*.json ./
 
 RUN npm install
 
-# Copy ONLY the backend folder's source code
+# Copy backend source
 COPY backend/. .
 
+# Build TypeScript → dist/
 RUN npm run build
 
-CMD ["npm", "run", "start:prod"]
+# Start the compiled app
+CMD ["npm", "run", "start"]
