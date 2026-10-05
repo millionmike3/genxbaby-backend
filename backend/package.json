@@ -1,13 +1,13 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.14.0",
     "cookie-parser": "^1.4.7",
@@ -17,7 +17,6 @@
     "pdf-lib": "^1.17.1",
     "prisma": "^5.14.0"
   },
-  "description": "",
   "devDependencies": {
     "ts-node": "^10.9.2",
     "typescript": "^7.0.2"
