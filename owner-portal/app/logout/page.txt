@@ -1,0 +1,35 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/toast/ToastProvider";
+
+export default function LogoutPage() {
+  const router = useRouter();
+  const toast = useToast();
+
+  useEffect(() => {
+    async function logout() {
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+
+        toast.addToast("Logged out successfully", "success");
+      } catch (err) {
+        toast.addToast("Logout failed", "error");
+      }
+
+      router.push("/login");
+    }
+
+    logout();
+  }, []);
+
+  return (
+    <div className="ml-64 p-10">
+      <p className="text-gray-400">Logging out…</p>
+    </div>
+  );
+}

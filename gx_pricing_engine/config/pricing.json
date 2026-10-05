@@ -1,0 +1,6 @@
+{
+  "target_profit_bps": 75,
+  "risk_premium_bps": 25,
+  "min_margin_bps": 25,
+  "max_margin_bps": 150
+}

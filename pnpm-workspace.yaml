@@ -1,0 +1,5 @@
+packages:
+  - "genxbaby-backend"
+  - "genxbaby-frontend"
+  - "gx_pricing_engine"
+  - "shared/*"

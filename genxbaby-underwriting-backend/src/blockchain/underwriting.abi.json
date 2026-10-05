@@ -1,0 +1,24 @@
+[
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "root", "type": "bytes32" }
+    ],
+    "name": "anchor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "root", "type": "bytes32" }
+    ],
+    "name": "getAnchor",
+    "outputs": [
+      { "internalType": "address", "name": "anchoredBy", "type": "address" },
+      { "internalType": "uint256", "name": "blockNumber", "type": "uint256" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

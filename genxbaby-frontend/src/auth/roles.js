@@ -1,0 +1,6 @@
+export const ROLES = {
+  ADMIN: "ADMIN",
+  OWNER: "OWNER",
+  BORROWER: "BORROWER",
+  INVESTOR: "INVESTOR",
+};

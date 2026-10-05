@@ -1,0 +1,33 @@
+import { NextResponse } from "next/server";
+import { generateCheckPdf } from "@/lib/generateCheckPdf";
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+
+    const pdfBytes = await generateCheckPdf({
+      bank: body.bank,
+      signer: body.signer,
+      checkNumber: body.checkNumber,
+      payee: body.payee,
+      amount: body.amount,
+      memo: body.memo,
+      date: body.date,
+    });
+
+    return new NextResponse(pdfBytes, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": "inline; filename=check-print.pdf",
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch (error) {
+    console.error("Print PDF error:", error);
+    return NextResponse.json(
+      { error: "Failed to generate printable PDF" },
+      { status: 500 }
+    );
+  }
+}

@@ -1,0 +1,249 @@
+/* --------------------------------------------------
+   GLOBAL RESET / BASE
+-------------------------------------------------- */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background-color: #f9fafb;
+  color: #111;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* --------------------------------------------------
+   DARK MODE ROOT
+-------------------------------------------------- */
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0f0f0f;
+  color: #e5e5e5;
+  animation: fadeInDark 0.3s ease;
+}
+
+@keyframes fadeInDark {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}
+
+/* --------------------------------------------------
+   SIDEBAR
+-------------------------------------------------- */
+
+aside {
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+html.dark aside {
+  background-color: #1a1a1a;
+  border-color: #333;
+  transform: translateX(0);
+}
+
+nav a {
+  color: #111;
+  text-decoration: none;
+  display: block;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+}
+
+nav a:hover {
+  color: #000;
+}
+
+html.dark nav a {
+  color: #e5e5e5;
+}
+
+html.dark nav a:hover {
+  color: #ffffff;
+}
+
+/* --------------------------------------------------
+   TABLES
+-------------------------------------------------- */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+thead {
+  background-color: #f3f4f6;
+  transition: background-color 0.25s ease;
+}
+
+html.dark table {
+  background-color: #1a1a1a;
+  color: #e5e5e5;
+}
+
+html.dark thead {
+  background-color: #2a2a2a;
+}
+
+tr {
+  border-top: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+html.dark tr {
+  border-color: #333;
+}
+
+/* --------------------------------------------------
+   CHECK ROWS (Registered / Voided)
+-------------------------------------------------- */
+
+.check-row {
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.check-row:hover {
+  background-color: #f9fafb;
+  transform: translateX(2px);
+}
+
+.check-row.registered {
+  border-left: 4px solid #16a34a; /* green */
+}
+
+.check-row.voided {
+  border-left: 4px solid #dc2626; /* red */
+  background-color: #fff5f5;
+}
+
+/* Dark mode versions */
+html.dark .check-row:hover {
+  background-color: #222;
+}
+
+html.dark .check-row.registered {
+  border-left: 4px solid #22c55e;
+}
+
+html.dark .check-row.voided {
+  border-left: 4px solid #ef4444;
+  background-color: #2a0f0f;
+}
+
+/* --------------------------------------------------
+   INPUTS
+-------------------------------------------------- */
+
+input {
+  background-color: #ffffff;
+  color: #111;
+  border: 1px solid #d1d5db;
+  padding: 8px;
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
+}
+
+input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+html.dark input {
+  background-color: #1f1f1f;
+  color: #e5e5e5;
+  border-color: #333;
+}
+
+/* --------------------------------------------------
+   BUTTONS
+-------------------------------------------------- */
+
+button {
+  background-color: #111;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background-color: #000;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+html.dark button {
+  background-color: #333;
+  color: #e5e5e5;
+}
+
+html.dark button:hover {
+  background-color: #444;
+}
+
+/* --------------------------------------------------
+   QR CODE CONTAINER
+-------------------------------------------------- */
+
+.qr-box {
+  background-color: #ffffff;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  display: inline-block;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+html.dark .qr-box {
+  background-color: #1a1a1a;
+  border-color: #333;
+}
+
+/* --------------------------------------------------
+   UTILITY CLASSES
+-------------------------------------------------- */
+
+.text-red {
+  color: #dc2626;
+}
+
+.text-green {
+  color: #16a34a;
+}
+
+.text-gray {
+  color: #6b7280;
+}
+.login-card {
+  animation: loginFade 0.35s ease;
+}
+
+@keyframes loginFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "application": {
+    "id": "test-app-001",
+    "amount": 350000,
+    "purpose": "PURCHASE",
+    "propertyValue": 500000,
+    "incomeAmount": 120000,
+    "incomeYears": 4,
+    "incomeVerified": true,
+    "ltv": 0.7,
+    "dti": 0.32
+  },
+  "borrower": {
+    "fullName": "Michael Turner",
+    "ssnLast4": "1234",
+    "dob": "1990-01-01",
+    "address": "106-34 Sutphin Blvd, Jamaica NY",
+    "kycVerified": true
+  },
+  "documents": [
+    { "name": "W2_2025.pdf", "verified": true },
+    { "name": "Bank_Statements.pdf", "verified": true }
+  ]
+}
