@@ -1,22 +1,45 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
+import { jwtVerify } from "jose";
 import { createPublicClient, http } from "viem";
 import { polygonAmoy } from "viem/chains";
 import { CHECK_REGISTRY_ABI } from "@/lib/contract";
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
   try {
-    const cookie = (req as any).cookies.get("admin_session")?.value;
+    // 1. Extract admin_token cookie manually
+    const cookieHeader = request.headers.get("cookie") || "";
+    const token = cookieHeader
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith("admin_token="))
+      ?.split("=")[1];
 
-    if (!cookie) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    if (!token) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
     }
 
-    const payload = jwt.verify(cookie, process.env.JWT_SECRET!) as any;
+    // 2. Verify JWT using JOSE
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    let payload: any;
 
+    try {
+      const verified = await jwtVerify(token, secret);
+      payload = verified.payload;
+    } catch (err) {
+      console.error("JWT VERIFY ERROR:", err);
+      return NextResponse.json(
+        { error: "Invalid or expired session" },
+        { status: 401 }
+      );
+    }
+
+    // 3. Fetch admin from database
     const admin = await prisma.admin.findUnique({
-      where: { id: payload.adminId },
+      where: { id: payload.id },
       select: {
         id: true,
         email: true,
@@ -26,12 +49,13 @@ export async function GET(req: Request) {
     });
 
     if (!admin) {
-      return NextResponse.json({ error: "Admin not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Admin not found" },
+        { status: 404 }
+      );
     }
 
-    // ---------------------------------------------
-    // On-chain admin verification
-    // ---------------------------------------------
+    // 4. On-chain admin verification
     let onChainAdmin = false;
 
     if (admin.walletAddress) {
@@ -48,15 +72,22 @@ export async function GET(req: Request) {
       });
     }
 
-    return NextResponse.json({
-      admin,
-      onChainAdmin,
-      session: {
-        expiresIn: payload.exp,
+    // 5. Return admin profile + session info
+    return NextResponse.json(
+      {
+        admin,
+        onChainAdmin,
+        session: {
+          expiresIn: payload.exp,
+        },
       },
-    });
+      { status: 200 }
+    );
   } catch (err) {
     console.error("ADMIN ME ERROR:", err);
-    return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Invalid session" },
+      { status: 401 }
+    );
   }
 }

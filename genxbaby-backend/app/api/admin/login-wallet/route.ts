@@ -70,28 +70,26 @@ export async function POST(req: Request) {
     }
 
     // ---------------------------------------------
-    // 4. Issue JWT session cookie
+    // 4. Issue JWT session cookie (correct format)
     // ---------------------------------------------
     const token = jwt.sign(
       {
-        adminId: admin.id,
-        email: admin.email,
-        role: admin.role,
+        id: admin.id,
+        role: "admin",
         wallet: admin.walletAddress,
       },
       process.env.JWT_SECRET!,
-      { expiresIn: "2h" }
+      { expiresIn: "7d" }
     );
 
     const res = NextResponse.json({ success: true });
 
-    res.cookies.set({
-      name: "admin_session",
-      value: token,
+    res.cookies.set("admin_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      path: "/",
       sameSite: "strict",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return res;

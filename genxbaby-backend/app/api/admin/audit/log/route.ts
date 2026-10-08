@@ -1,33 +1,63 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
+import { jwtVerify } from "jose";
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const cookie = (req as any).cookies.get("admin_session")?.value;
-    if (!cookie) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // 1. Extract admin_token cookie
+    const cookieHeader = request.headers.get("cookie") || "";
+    const token = cookieHeader
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith("admin_token="))
+      ?.split("=")[1];
 
-    const payload = jwt.verify(cookie, process.env.JWT_SECRET!) as any;
+    if (!token) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
-    const { action, metadata } = await req.json();
+    // 2. Verify JWT using JOSE
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    let payload: any;
 
-    const ip =
-      (req.headers as any).get?.("x-forwarded-for") ||
-      req.headers.get("x-real-ip") ||
-      "unknown";
+    try {
+      const verified = await jwtVerify(token, secret);
+      payload = verified.payload;
+    } catch (err) {
+      console.error("JWT VERIFY ERROR:", err);
+      return NextResponse.json(
+        { error: "Invalid or expired session" },
+        { status: 401 }
+      );
+    }
 
+    // 3. Parse request body
+    const { action, metadata } = await request.json();
+
+    // 4. Capture IP address
+    const forwarded = request.headers.get("x-forwarded-for");
+    const realIp = request.headers.get("x-real-ip");
+    const ip = forwarded || realIp || "unknown";
+
+    // 5. Write audit log entry
     await prisma.auditLog.create({
       data: {
-        adminId: payload.adminId,
+        adminId: payload.id,
         action,
         metadata,
         ip,
       },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
     console.error("AUDIT LOG ERROR:", err);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed" },
+      { status: 500 }
+    );
   }
 }

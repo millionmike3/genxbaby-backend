@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { jwtVerify } from "jose";
-import { createWalletClient, http } from "viem";
-import { polygonAmoy } from "viem/chains";
-import { CHECK_REGISTRY_ABI } from "@/lib/contract";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
-    // 1. Extract admin_token cookie
+    // 1. Read admin cookie
     const cookieHeader = request.headers.get("cookie") || "";
     const token = cookieHeader
       .split(";")
@@ -21,7 +20,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Verify JWT using JOSE
+    // 2. Verify JWT
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     let payload: any;
 
@@ -36,45 +35,38 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Enforce admin role
-    if (payload.role !== "admin") {
-      return NextResponse.json(
-        { error: "Forbidden" },
-        { status: 403 }
-      );
-    }
+    // 3. Parse request body
+    const { passwordHash, adminId } = await request.json();
 
-    // 4. Parse body
-    const { wallet } = await request.json();
-    if (!wallet) {
+    if (!passwordHash || !adminId) {
       return NextResponse.json(
-        { error: "Missing wallet address" },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // 5. On-chain revoke role
-    const client = createWalletClient({
-      chain: polygonAmoy,
-      transport: http(process.env.NEXT_PUBLIC_RPC_URL!),
-      account: process.env.ADMIN_PRIVATE_KEY as `0x${string}`,
-    });
+    // 4. Ensure the adminId matches the JWT payload
+    if (payload.id !== adminId) {
+      return NextResponse.json(
+        { error: "Unauthorized: ID mismatch" },
+        { status: 403 }
+      );
+    }
 
-    const tx = await client.writeContract({
-      address: process.env.CHECK_REGISTRY_ADDRESS as `0x${string}`,
-      abi: CHECK_REGISTRY_ABI,
-      functionName: "revokeRole",
-      args: ["DEFAULT_ADMIN_ROLE", wallet],
+    // 5. Update password in DB
+    await prisma.admin.update({
+      where: { id: adminId },
+      data: { passwordHash },
     });
 
     return NextResponse.json(
-      { success: true, tx },
+      { success: true },
       { status: 200 }
     );
   } catch (err) {
-    console.error("REVOKE ROLE ERROR:", err);
+    console.error("BACKEND PASSWORD UPDATE ERROR:", err);
     return NextResponse.json(
-      { error: "Failed" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

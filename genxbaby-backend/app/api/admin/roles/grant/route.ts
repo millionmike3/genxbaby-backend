@@ -1,22 +1,59 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 import { createWalletClient, http } from "viem";
 import { polygonAmoy } from "viem/chains";
 import { CHECK_REGISTRY_ABI } from "@/lib/contract";
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const cookie = (req as any).cookies.get("admin_session")?.value;
-    if (!cookie) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // 1. Extract admin_token cookie
+    const cookieHeader = request.headers.get("cookie") || "";
+    const token = cookieHeader
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith("admin_token="))
+      ?.split("=")[1];
 
-    const payload = jwt.verify(cookie, process.env.JWT_SECRET!) as any;
-
-    if (payload.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!token) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    const { wallet } = await req.json();
+    // 2. Verify JWT using JOSE
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    let payload: any;
 
+    try {
+      const verified = await jwtVerify(token, secret);
+      payload = verified.payload;
+    } catch (err) {
+      console.error("JWT VERIFY ERROR:", err);
+      return NextResponse.json(
+        { error: "Invalid or expired session" },
+        { status: 401 }
+      );
+    }
+
+    // 3. Enforce admin role
+    if (payload.role !== "admin") {
+      return NextResponse.json(
+        { error: "Forbidden" },
+        { status: 403 }
+      );
+    }
+
+    // 4. Parse body
+    const { wallet } = await request.json();
+    if (!wallet) {
+      return NextResponse.json(
+        { error: "Missing wallet address" },
+        { status: 400 }
+      );
+    }
+
+    // 5. On-chain grant role
     const client = createWalletClient({
       chain: polygonAmoy,
       transport: http(process.env.NEXT_PUBLIC_RPC_URL!),
@@ -30,9 +67,15 @@ export async function POST(req: Request) {
       args: ["DEFAULT_ADMIN_ROLE", wallet],
     });
 
-    return NextResponse.json({ success: true, tx });
+    return NextResponse.json(
+      { success: true, tx },
+      { status: 200 }
+    );
   } catch (err) {
     console.error("GRANT ROLE ERROR:", err);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed" },
+      { status: 500 }
+    );
   }
 }
