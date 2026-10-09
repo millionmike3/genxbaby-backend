@@ -19,10 +19,7 @@
   },
 
   "include": [
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "lib/**/*.ts",
-    "middleware.ts"
+    "backend/src/**/*.ts"
   ],
 
   "exclude": ["node_modules", "dist"]
