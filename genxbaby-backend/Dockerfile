@@ -2,14 +2,18 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy package.json and lock file
+# Install root dependencies (if any)
 COPY genxbaby-backend/package*.json ./
-
 RUN npm install
+
+# Install backend dependencies
+COPY genxbaby-backend/backend/package*.json ./backend/
+RUN cd backend && npm install
 
 # Copy the rest of the backend
 COPY genxbaby-backend/. .
 
-RUN npm run build
+# Build backend
+RUN cd backend && npm run build
 
-CMD ["npm", "start"]
+CMD ["node", "backend/dist/main.js"]
